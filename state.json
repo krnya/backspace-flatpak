@@ -1,6 +1,6 @@
 {
   "asset": "repository-41240647438-2.tar.gz",
-  "deployed_asset": null,
+  "deployed_asset": "repository-41240647438-2.tar.gz",
   "fingerprint": "485761C57C3C51066AD61DFC8B1997B1F4EC8E2F",
   "input_id": "88b61311a85592f8e124e15af4e4c871cad05e9ef29dd23b276340d73fef044c",
   "schema": 1,
