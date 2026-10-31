@@ -1,0 +1,17 @@
+__pycache__/
+.venv/
+.flatpak-builder/
+_build/
+repo/
+site/
+artifacts/
+diagnostics/
+*.tar.zst
+*.tar.gz
+*.flatpak
+state.json
+plan.json
+*.gpg
+*.asc
+
+.local-build/

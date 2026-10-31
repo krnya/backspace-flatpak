@@ -1,0 +1,14 @@
+{
+  "files": {
+    "flatpak/build.sh": "42a70983a6d142cbca1f89cf8e0b1375fe8c34e8b8cf5988ef0ffecde09edf26",
+    "flatpak/io.github.TheZwiss.backspace.desktop": "b8c7e1fdb8d3db2c1d0da528ce3d3bcbec37d4bd4a6a22f83daa287a87e58d22",
+    "flatpak/io.github.TheZwiss.backspace.metainfo.xml": "0cda96a97110a1dade84c9997f282eb146c9371a8b363b9592aba23dc70ac168",
+    "flatpak/node-sources.json": "8802198cd282d214bec67b6ef02f8ff1c80f0c155343be9b5b2f29224b2869c5",
+    "io.github.TheZwiss.backspace.yml": "47175ee3f246ea00178d85f3fb24ede1fe9a28797083876021b0acbd35431a9b"
+  },
+  "metadata_commit": "2885a7d35c0e9188eb337ab238df992073e68df5",
+  "release_lockfile_sha256": "452f14bd0f9d3fb1a27f08ea208753db1e362ea1831e4432875d037bf03331a1",
+  "schema": 1,
+  "source_commit": "cfa6ce43306f829f1c273f6402ef625362b793da",
+  "tag": "v1.11.0"
+}

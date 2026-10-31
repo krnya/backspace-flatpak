@@ -1,0 +1,78 @@
+name: Sync and publish Backspace
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: Rebuild even if the build inputs are unchanged
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'requirements.txt'
+      - 'upstream.lock.json'
+      - 'flatpak/**'
+      - 'io.github.TheZwiss.backspace.yml'
+
+permissions:
+  contents: read
+
+# One lock covers synchronization, snapshot updates, Pages deployment and acknowledgement.
+# Do not add the same lock to the called workflow (that would deadlock).
+concurrency:
+  group: backspace-flatpak-publication
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    outputs:
+      revision: ${{ steps.sync.outputs.revision }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - name: Install validation dependency
+        run: python3 -m pip install --require-hashes -r requirements.txt
+      - name: Check and synchronize stable release
+        id: sync
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          python3 scripts/sync-upstream.py
+          python3 scripts/validate.py
+          git add io.github.TheZwiss.backspace.yml flatpak upstream.lock.json
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Synchronize upstream stable Flatpak packaging'
+            git push origin "HEAD:refs/heads/$DEFAULT_BRANCH"
+          fi
+          echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Test packaging automation
+        run: python3 -m unittest discover -s tests -v
+
+  publish:
+    needs: sync
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/build.yml
+    with:
+      revision: ${{ needs.sync.outputs.revision }}
+      force_rebuild: ${{ inputs.force_rebuild == true }}
+    secrets:
+      FLATPAK_GPG_PRIVATE_KEY: ${{ secrets.FLATPAK_GPG_PRIVATE_KEY }}
+      FLATPAK_GPG_FINGERPRINT: ${{ secrets.FLATPAK_GPG_FINGERPRINT }}
